@@ -2,7 +2,13 @@
 
 Web clock for nginx, ideal for NTP servers.
 
-This project was inspired by the [USNO Master Clock](http://www.usno.navy.mil/USNO/time/display-clocks/simpletime).
+This project was inspired by the [USNO Master Clock](http://www.usno.navy.mil/USNO/time/display-clocks/simpletime)
+and a number of other web clocks, such as
+* [time.gov (NIST web clock)](https://www.time.gov/)
+* [PTB Web Clock](https://uhr.ptb.de/)
+* [NICT/JST Clock](https://www1.nict.go.jp/JST/JST_E.html)
+* [Paris Observatory/SYRTE Web Clock](https://syrte.obspm.fr/cgi-bin/heure_op_js)
+* [NRC Web Clock](https://www.nrc-cnrc.gc.ca/eng/services/time/web_clock.html)
 
 # License \(2-clause BSD)
 
