@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- @!!erase me if demo!!
+<script src="https://webclockbackend.appspot.com/generate_204"></script>
+@!!erase me if demo!! -->
 <title>Self-Hosted Web Clock</title>
 <script type=text/javascript>
 var xhrObj = null;
@@ -8,6 +11,8 @@ var xhrObj = null;
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, syncActive: false};
 var allowUpdate = true;
 var server_time = null;
+var isDemo = true;
+var timeZone = -9999;
 /* determine whether window.performance.now is available */
 function try_performance_now() {
 	var testVal = -1234567;
@@ -63,6 +68,7 @@ function get_time_from_server_part2() {
 	display_time();
 }
 function get_time_from_server(do_clear) {
+	isDemo = false; /* @!!erase me if demo!! */
 	if (do_clear) {
 		/* stop clock, reset zero */
 		if (programState.timerObj != 0) clearTimeout(programState.timerObj);
@@ -76,7 +82,7 @@ function get_time_from_server(do_clear) {
 	xhrObj = new XMLHttpRequest();
 	programState.startTime = get_current_time();
 	xhrObj.onreadystatechange = get_time_from_server_part2;
-	xhrObj.open("GET", "/insvc/time?random=" + Math.random(), true);
+	xhrObj.open("GET", (isDemo ? "https://webclockbackend.appspot.com/demo" : "/insvc/time") + "?random=" + Math.random(), true);
 	xhrObj.send(null);
 }
 function display_time() {
@@ -86,8 +92,10 @@ function display_time() {
 	var newrtime = new Date(server_time.rbase + incr);
 	var timeTillNextSecond = 1000 - newrtime.getUTCMilliseconds();
 	newrtime.setUTCMilliseconds(0);
-	set_display("time", newrtime.toISOString().replace(/T/, "<br>").replace(/\....Z/, ""));
+	set_display("time", new Date(newrtime.getTime() + ((timeZone == -9999) ? (newrtime.getTimezoneOffset() * -60000) : (timeZone * 3600000))).toISOString().replace(/T/, "<br>").replace(/\....Z/, ""));
 	programState.timerObj = setTimeout(display_time, timeTillNextSecond);
+	/* display the utc offset */
+	document.getElementById("utcoffset").innerHTML = newrtime.getTimezoneOffset() / -60.0;
 	/* sync */
 	if (programState.syncActive) {
 		if (get_time_diff(false)) {
@@ -108,6 +116,11 @@ function display_time() {
 <div id=status>&nbsp;</div>
 <div id=status2>&nbsp;</div>
 <p><a href="javascript:get_time_from_server(true);">Resynchronize now</a></p>
+<p>
+<button onclick="timeZone = -9999;">Local Time (UTC<span id="utcoffset"></span>)</button>
+<button onclick="timeZone = 0;">Coordinated Universal Time (UTC)</button>
+<hr />
+<p>&copy; 2018 Peter Jin<br /><a href="https://github.com/nathanmtgh/nginx-clock">GitHub</a> - <a href="https://gitlab.com/nathanmtgh/nginx-clock">GitLab</a></p>
 </span>
 </body>
 </html>

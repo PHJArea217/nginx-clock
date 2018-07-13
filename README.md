@@ -10,7 +10,16 @@ and a number of other web clocks, such as
 * [Paris Observatory/SYRTE Web Clock](https://syrte.obspm.fr/cgi-bin/heure_op_js)
 * [NRC Web Clock](https://www.nrc-cnrc.gc.ca/eng/services/time/web_clock.html)
 
+The clock displays time in local time and Coordinated Universal Time \(UTC).
+Support for other time zones and daylight saving time is planned.
+
+A live version of this web clock is available at https://webclock.peterjin.org.
+See [this document](online-demo.md) for more information.
+
 # License \(2-clause BSD)
+
+Copyright 2018 Peter H. Jin
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

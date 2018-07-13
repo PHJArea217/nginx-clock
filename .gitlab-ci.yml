@@ -1,0 +1,9 @@
+pages:
+  stage: deploy
+  script:
+  - sh make_demo.sh
+  artifacts:
+    paths:
+    - demo
+  only:
+  - master
