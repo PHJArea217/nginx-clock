@@ -4,6 +4,6 @@ pages:
   - sh make_demo.sh
   artifacts:
     paths:
-    - demo
+    - public
   only:
   - master

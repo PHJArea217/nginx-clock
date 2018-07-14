@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mkdir -p demo
-sed '/@!!erase me if demo!!/d' index.html > demo/index.html
+mkdir -p public
+sed '/@!!erase me if demo!!/d' index.html > public/index.html
