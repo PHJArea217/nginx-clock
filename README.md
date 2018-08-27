@@ -16,6 +16,12 @@ Support for other time zones and daylight saving time is planned.
 A live version of this web clock is available at https://webclock.peterjin.org.
 See [this document](online-demo.md) for more information.
 
+# Todo list
+
+- [ ] Time zone selector
+- [ ] Leap second warnings \(via IERS bulletin parsing)
+- [ ] Use multiple endpoint requests and average them out
+
 # License \(2-clause BSD)
 
 Copyright 2018 Peter H. Jin

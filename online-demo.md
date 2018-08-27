@@ -6,7 +6,8 @@ GitLab Pages for static content with Google App Engine as the backend.
 
 Originally, I was considering the use of nginx on a VPS such as DigitalOcean,
 but it was a bit too expensive for such a simple app \(one HTTP request that
-simply returns the time). We use the Always Free limits.
+simply returns the time). We use the Always Free limits; I have not even used
+even one cent of my free trial credit.
 
 ## How accurate is the backend clock?
 
@@ -29,7 +30,7 @@ response necessary for the web clock.
 
 ## Can I use the API endpoint for my own demo?
 
-Sorry, no. This web clock was designed for hosting on your own NTP server, not
+This web clock was designed for hosting on your own NTP server, not
 on someone else's server. However, if I decide that I have not nearly reached
 quota limits, I may allow access from other domains.
 
