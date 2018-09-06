@@ -2,7 +2,7 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- @!!erase me if demo!!
-<script src="https://us-central-1-webclockbackend.cloudfunctions.net/generate_204"></script>
+<script src="https://us-central1-webclockbackend.cloudfunctions.net/generate_204"></script>
 @!!erase me if demo!! -->
 <title>Self-Hosted Web Clock</title>
 <script type=text/javascript>
@@ -63,7 +63,7 @@ function get_time_from_server_part2() {
 	server_time = {"lbase": localTime, "rbase": remoteTime + latency};
 	set_display("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(server_time.rbase - new Date().getTime()) + " ms");
 	get_time_diff(true);
-	programState.syncCtr = 300;
+	programState.syncCtr = 1000;
 	programState.syncActive = true;
 	display_time();
 }
@@ -82,7 +82,7 @@ function get_time_from_server(do_clear) {
 	xhrObj = new XMLHttpRequest();
 	programState.startTime = get_current_time();
 	xhrObj.onreadystatechange = get_time_from_server_part2;
-	xhrObj.open("GET", (isDemo ? "https://us-central-1-webclockbackend.cloudfunctions.net/insvc-time" : "/insvc/time") + "?random=" + Math.random(), true);
+	xhrObj.open("GET", (isDemo ? "https://us-central1-webclockbackend.cloudfunctions.net/insvc-time" : "/insvc/time") + "?random=" + Math.random(), true);
 	xhrObj.send(null);
 }
 function display_time() {
