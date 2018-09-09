@@ -77,7 +77,7 @@ function get_time_from_server(do_clear) {
 	}
 	programState.syncActive = false;
 	set_display("status2", "Resynchronizing now.");
-	if (xhrObj != null) xhrObj.abort();
+	if (xhrObj !== null) xhrObj.abort();
 	/* create request and record start time */
 	xhrObj = new XMLHttpRequest();
 	programState.startTime = get_current_time();
