@@ -2,7 +2,7 @@
 
 Web clock for nginx, ideal for NTP servers.
 
-This project was inspired by the [USNO Master Clock](http://www.usno.navy.mil/USNO/time/display-clocks/simpletime)
+This project was inspired by the [USNO Master Clock](https://www.usno.navy.mil/USNO/time/display-clocks/simpletime)
 and a number of other web clocks, such as
 * [time.gov (NIST web clock)](https://www.time.gov/)
 * [PTB Web Clock](https://uhr.ptb.de/)
@@ -10,17 +10,19 @@ and a number of other web clocks, such as
 * [Paris Observatory/SYRTE Web Clock](https://syrte.obspm.fr/cgi-bin/heure_op_js)
 * [NRC Web Clock](https://www.nrc-cnrc.gc.ca/eng/services/time/web_clock.html)
 
-The clock displays time in local time and Coordinated Universal Time \(UTC).
-Support for other time zones and daylight saving time is planned.
+The clock displays time in local time, Coordinated Universal Time \(UTC) and
+all half-hour time zone offsets from -12 to +14.
+Support for ~~other time zones and~~ daylight saving time is planned.
 
 A live version of this web clock is available at https://webclock.peterjin.org.
 See [this document](online-demo.md) for more information.
 
 # Todo list
 
-- [ ] Time zone selector
-- [ ] Leap second warnings \(via IERS bulletin parsing)
+- [x] Time zone selector
+- [x] Leap second warnings \(via IERS bulletin parsing)
 - [ ] Use multiple endpoint requests and average them out
+- [ ] Daylight saving time/summer time in time zone selector
 
 # License \(2-clause BSD)
 
