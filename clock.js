@@ -55,10 +55,12 @@ function get_time_from_server_part2() {
 	var localTime = get_current_time();
 	/* half rtt */
 	var latency = (localTime - programState.startTime) / 2;
-	var remoteTime = JSON.parse(xhrObj.responseText).time * 1000;
+	var resultJson = JSON.parse(xhrObj.responseText);
+	var remoteTime = resultJson.time * 1000;
 	/* when local time is lbase, remote time is rbase */
 	server_time = {"lbase": localTime, "rbase": remoteTime + latency};
 	set_display("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(server_time.rbase - new Date().getTime()) + " ms");
+	set_display("ipaddr", resultJson.remoteIP);
 	get_time_diff(true);
 	programState.syncCtr = 1000;
 	programState.syncActive = true;
