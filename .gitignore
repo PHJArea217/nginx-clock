@@ -1,4 +1,4 @@
 priv/
-demo/
+public/
 *.class
 iers-bulcd.json

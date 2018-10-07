@@ -17,6 +17,10 @@ Support for ~~other time zones and~~ daylight saving time is planned.
 A live version of this web clock is available at https://webclock.peterjin.org.
 See [this document](online-demo.md) for more information.
 
+To enable leap second warnings, compile and run ```IERSBulletinReader.java```
+using Java 8 or later and write its output to a file named ```iers-bulcd.json```
+located in the same directory as the ```index.html``` file.
+
 # Todo list
 
 - [x] Time zone selector
