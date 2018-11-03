@@ -141,8 +141,10 @@ function display_time() {
 		var key = timeZone.substring(1);
 		var data = tzList[key];
 		var callback = function(tTime, tOff, nTime, nOff, useUTC) {
-			console.log(nTime);
-			var nextDST = nTime === 'N/A' ? '&nbsp;' : `Next DST: ${nOff !== 0 ? 'begins' : 'ends'} at ${nTime + (useUTC ? ' (UTC)' : '')}`;
+			var nTimeAdjust = new Date(nTime + "Z");
+			if (!useUTC) nTimeAdjust = new Date(nTimeAdjust.getTime() + 3600000 * tOff);
+			var nTimeStr = displayDateToString(nTimeAdjust) + " " + displayTimeToString(nTimeAdjust, useAMPM);
+			var nextDST = nTime === 'N/A' ? '&nbsp;' : `Next DST: ${nOff !== 0 ? 'begins' : 'ends'} at ${nTimeStr + (useUTC ? ' (UTC)' : '')}`;
 			set_display("tzInfo", `
 			${convertDSTName(data.name, tOff !== 0)} (${getUtcOffsetS(data.stdo + tOff)})<br>&nbsp;
 			${nextDST}`);
