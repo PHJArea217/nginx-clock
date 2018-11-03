@@ -3,11 +3,16 @@ var xhrObj = null;
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
 var allowUpdate = true;
+var useAMPM = false;
 var server_time = null;
-var timeZone = -9999;
+var timeZone = "U-9999";
 /* show/hide the "resynchronize now" link */
 function showResynchronize(t) {
 	document.getElementById("resync_now_button").style.display = t ? "" : "none";
+}
+function show_resync() {
+	document.getElementById("resync_control").style.display = "";
+	document.getElementById("resync_control_show_button").style.display = "none";
 }
 /* determine whether window.performance.now is available */
 function try_performance_now() {
@@ -43,9 +48,9 @@ function set_display(f, v) {
 	document.getElementById(f).innerHTML = v;
 }
 function get_time_from_server_part2() {
-	if (xhrObj.readyState != 4) return;
+	if (xhrObj.readyState !== 4) return;
 	xhrObj.onreadystatechange = null;
-	if (xhrObj.status != 200) {
+	if (xhrObj.status !== 200) {
 		set_display("status", "An unexpected error (" + xhrObj.status + ") has occurred.");
 		set_display("status2", "Click below to resynchronize again");
 		setTimeout(() => showResynchronize(true), 1000);
@@ -55,6 +60,8 @@ function get_time_from_server_part2() {
 	var localTime = get_current_time();
 	/* half rtt */
 	var latency = (localTime - programState.startTime) / 2;
+	/* latency > 500 ms usually due to stalling server */
+	if (latency >= 500) latency = 500;
 	var resultJson = JSON.parse(xhrObj.responseText);
 	var remoteTime = resultJson.time * 1000;
 	/* when local time is lbase, remote time is rbase */
@@ -71,9 +78,10 @@ function get_time_from_server_part2() {
 function get_time_from_server(do_clear) {
 	if (do_clear) {
 		/* stop clock, reset zero */
-		if (programState.timerObj != 0) clearTimeout(programState.timerObj);
+		if (programState.timerObj !== 0) clearTimeout(programState.timerObj);
 		programState.timerObj = 0;
-		set_display("time", "0000-00-00<br>00:00:00");
+		set_display("time", "00:00:00");
+		set_display("date", "&nbsp;");
 	}
 	showResynchronize(false); /* hide the button to prevent repeated clicking */
 	programState.syncActive = false;
@@ -86,6 +94,30 @@ function get_time_from_server(do_clear) {
 	xhrObj.open("GET", (isDemo ? "https://us-central1-webclockbackend.cloudfunctions.net/insvc-time" : "/insvc/time") + "?random=" + Math.random(), true);
 	xhrObj.send(null);
 }
+function set_ampm(ampm) {
+	useAMPM = ampm;
+}
+function displayTimeToString(time, useAMPM) {
+	var ampm = '';
+	var h = time.getUTCHours();
+	if (useAMPM) {
+		ampm = h >= 12 ? 'p.m.' : 'a.m.';
+		h = h % 12;
+		if (h === 0) h = 12;
+	}
+	var p = m => m < 10 ? '0' : '';
+	var m = time.getUTCMinutes();
+	var s = time.getUTCSeconds();
+	return `${p(h)}${h}:${p(m)}${m}:${p(s)}${s} ${ampm}`;
+}
+function displayDateToString(time) {
+	var daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	var p = m => m < 10 ? '0' : '';
+	var y = time.getUTCFullYear();
+	var m = time.getUTCMonth() + 1;
+	var d = time.getUTCDate();
+	return `${daysOfTheWeek[time.getUTCDay()]} ${y}-${p(m)}${m}-${p(d)}${d}`;
+}
 function display_time() {
 	var newltime = get_current_time();
 	var incr = newltime - server_time.lbase;
@@ -93,7 +125,35 @@ function display_time() {
 	var newrtime = new Date(server_time.rbase + incr);
 	var timeTillNextSecond = 1000 - newrtime.getUTCMilliseconds();
 	newrtime.setUTCMilliseconds(0);
-	set_display("time", new Date(newrtime.getTime() + ((timeZone == -9999) ? (newrtime.getTimezoneOffset() * -60000) : (timeZone * 3600000))).toISOString().replace(/T/, "<br>").replace(/\....Z/, ""));
+	/* Calculate the time zone offset */
+	var ofs = 0;
+	if (timeZone.match(/^U.*/)) {
+		/* UTC+-N including localtime */
+		var offset = parseFloat(timeZone.substring(1), 10);
+		if (offset === null || offset === -9999) {
+			ofs = newrtime.getTimezoneOffset() * -60000;
+		} else {
+			ofs = offset * 3600000;
+		}
+		set_display("tzInfo", getUtcOffsetS(ofs / 3600000) + '<br />&nbsp;');
+	} else if (timeZone.match(/^X.*/)) {
+		/* Predefined time zone */
+		var key = timeZone.substring(1);
+		var data = tzList[key];
+		var callback = function(tTime, tOff, nTime, nOff, useUTC) {
+			console.log(nTime);
+			var nextDST = nTime === 'N/A' ? '&nbsp;' : `Next DST: ${nOff !== 0 ? 'begins' : 'ends'} at ${nTime + (useUTC ? ' (UTC)' : '')}`;
+			set_display("tzInfo", `
+			${convertDSTName(data.name, tOff !== 0)} (${getUtcOffsetS(data.stdo + tOff)})<br>&nbsp;
+			${nextDST}`);
+		};
+		if (data !== undefined && data !== null) {
+			ofs = Number(getDST(data.stdo * 3600000, data.dst, newrtime, callback));
+		}
+	}
+	var displayTime = new Date(newrtime.getTime() + ofs);
+	set_display("time", displayTimeToString(displayTime, useAMPM));
+	set_display("date", displayDateToString(displayTime));
 	programState.timerObj = setTimeout(display_time, timeTillNextSecond);
 	/* display the utc offset */
 	/* = newrtime.getTimezoneOffset() / -60.0; */

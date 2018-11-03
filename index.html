@@ -3,29 +3,72 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- @!!erase me if demo!!
 <script src="https://us-central1-webclockbackend.cloudfunctions.net/generate_204"></script>
+<title>Online Web Clock</title>
 @!!erase me if demo!! -->
-<title>Self-Hosted Web Clock</title>
+<title>Self-Hosted Web Clock</title> <!-- @!!erase me if demo!! -->
+<style>
+body {
+	background: #333;
+}
+#date, #topText, #tzInfo {
+	background: #000;
+	color: #fff;
+	padding-bottom: 8px;
+	padding-top: 8px;
+}
+#time {
+	background: #488;
+	color: #fff;
+	font-size: 64px;
+	font-family: sans-serif;
+	font-weight: bold;
+}
+#topText {
+	font-size: 28px;
+	color: #bf9;
+}
+.main-content {
+	color: #fff;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	width: 600px;
+}
+a:link {
+	color: #ccfb;
+}
+a:visited {
+	color: #fcf;
+}
+</style>
 <script type="text/javascript">
 var isDemo = true;
 isDemo = false; /* @!!erase me if demo!! */
 </script>
 <script type="text/javascript" src="iers.js"></script>
 <script type="text/javascript" src="clock.js"></script>
+<script type="text/javascript" src="dst.js"></script>
 <script type="text/javascript" src="tzselector.js"></script>
 </head>
 <body onload="try_performance_now(); get_time_from_server(true); tzselector_init(); read_iers_bulletin();">
-<span style="text-align: center;">
-<div id="topText" style="font-size: 24px;">Right now, the current time is:</div>
-<div id="time" style="font-size: 64px; font-family: monospace;">No JS?</div>
+<br />
+<div class="main-content">
+<div id="topText">Right now, the current time is:</div>
+<div id="time">No JS?</div>
+<div id="date" style="font-size: 32px;">&nbsp;</div>
+<div id="tzInfo">&nbsp;<br />&nbsp;</div><br />
+<div><select id="tzselector"></select></div>
+<p><a href="javascript:set_ampm(true);">12-hr</a> | <a href="javascript:set_ampm(false);">24-hr</a></p>
+<p id="iersbulcd">&nbsp;</p>
+<p id="resync_control_show_button"><a href="javascript:show_resync();">Technical Information</a></p>
+<div id="resync_control" style="display: none;">
 <div id="status">&nbsp;</div>
 <div id="status2">Please enable JavaScript.</div>
 <p>&nbsp;<span id="resync_now_button" style="display: none;"><a href="javascript:get_time_from_server(true);">Resynchronize now</a></span>&nbsp;</p>
-<div><select id="tzselector"></select></div>
-<p>Note: DST not yet implemented</p>
-<div id="iersbulcd">&nbsp;</div>
 <p>Your IP address is: <span id="ipaddr"></span></p>
+</div>
 <hr />
 <p>&copy; 2018 Peter Jin<br /><a href="https://github.com/PHJArea217/nginx-clock">GitHub</a> - <a href="https://gitlab.com/PHJArea217/nginx-clock">GitLab</a></p>
-</span>
+</div>
 </body>
 </html>

@@ -1,35 +1,95 @@
-var tzList = [
+var tzList = {
 	/* # replaced with "Daylight " / "Standard " and @ replaced with "Summer " / empty string */
-	{name: "Aleutian #Time", dst: "us", stdo: -9, dsto: -8},
-	{name: "Pacific #Time", dst: "us", stdo: -8, dsto: -7},
-	{name: "Mountain #Time", dst: "us", stdo: -7, dsto: -6},
-	{name: "Central #Time (US/Canada)", dst: "us", stdo: -6, dsto: -5},
-	{name: "Eastern #Time (US/Canada)", dst: "us", stdo: -5, dsto: -4},
-	{name: "Atlantic #Time", dst: "us", stdo: -4, dsto: -3},
-	{name: "Newfoundland #Time", dst: "us", stdo: -3.5, dsto: -2.5},
-	{name: "Western European @Time", dst: "eu", stdo: 0, dsto: 1},
-	{name: "Central European @Time", dst: "eu", stdo: 1, dsto: 2},
-	{name: "Eastern European @Time", dst: "eu", stdo: 2, dsto: 3},
+	A0: {name: "Alaska #Time", dst: "us", stdo: -9},
+	A1: {name: "Pacific #Time", dst: "us", stdo: -8},
+	A2: {name: "Mountain #Time", dst: "us", stdo: -7},
+	A3: {name: "Central #Time (US/Canada)", dst: "us", stdo: -6},
+	A4: {name: "Eastern #Time (US/Canada)", dst: "us", stdo: -5},
+	A5: {name: "Atlantic #Time", dst: "us", stdo: -4},
+	A6: {name: "Newfoundland #Time", dst: "us", stdo: -3.5},
+	A7: {name: "Western European @Time", dst: "eu", stdo: 0},
+	A8: {name: "Central European @Time", dst: "eu", stdo: 1},
+	A9: {name: "Eastern European @Time", dst: "eu", stdo: 2},
 	/* Technically not required but those looking for AWST may be surprised
 	 * that it's not located before ACST */
-	{name: "Australian Western #Time", dst: "none", stdo: 8},
-	{name: "Australian Central #Time", dst: "au", stdo: 9.5, dsto: 10.5},
-	{name: "Australian Eastern #Time", dst: "au", stdo: 10, dsto: 11},
+	A10: {name: "Australian Western #Time", dst: "none", stdo: 8},
+	A11: {name: "Australian Central #Time", dst: "au", stdo: 9.5},
+	A12: {name: "Australian Eastern #Time", dst: "au", stdo: 10},
 	/* Quarter-hour UTC offsets not otherwise selectable using the selector */
-	{name: "Nepal Standard Time", dst: "none", stdo: 5.75},
-	{name: "Australian Central Western Time", dst: "none", stdo: 8.75},
-	{name: "Chatham Standard Time", dst: "au", stdo: 12.75, dsto: 13.75}
-];
+	A13: {name: "Nepal Standard Time", dst: "none", stdo: 5.75},
+	A14: {name: "Australian Central Western Time", dst: "none", stdo: 8.75},
+	A15: {name: "Chatham Standard Time", dst: "au", stdo: 12.75}
+};
 function tzselector_init() {
-	var iHtml = '<option value="-9999">Local Time</option>';
-	for (var i=-12; i<=14; i += 0.5) {
-		iHtml += '<option value="' + i + '">UTC' + (i >= 0 ? "+" : "") + i + '</option>';
-	}
+	/* Restore state of current time zone. */
+	var currTz = String(window.location.hash.substring(10));
+	
 	var d = document.getElementById("tzselector");
-	d.innerHTML = iHtml;
+	var optionElement = document.createElement('option');
+	optionElement.value = "U-9999";
+	optionElement.text = "Local Time";
+	d.add(optionElement);
+	for (var i=-12; i<=14; i += 0.5) {
+		optionElement = document.createElement('option');
+		optionElement.value = 'U' + i;
+		optionElement.text = getUtcOffsetS(i);
+		if (currTz === optionElement.value) {
+			timeZone = currTz;
+			optionElement.selected = true;
+		}
+		d.add(optionElement);
+	}
+	for (var key in tzList) {
+		optionElement = document.createElement('option');
+		optionElement.value = 'X' + key;
+		optionElement.text = tzList[key].name.replace(/[#@]/, '');
+		if (currTz === optionElement.value) {
+			timeZone = currTz;
+			optionElement.selected = true;
+		}
+		d.add(optionElement);
+	}
 	d.onchange = function () {
 		var v = d.options[d.selectedIndex].value;
-		window.location.hash = "_________U" + v;
-		timeZone = parseFloat(v, 10);
+		window.location.hash = "_________" + v;
+		timeZone = String(v);
 	};
+}
+function getUtcOffsetS(offset) {
+	return "UTC" + (offset >= 0 ? '+' : '') + offset;
+}
+function convertDSTName(name, isDst) {
+	return String(name).replace(/@/, isDst ? 'Summer ' : '').replace(/#/, isDst ? 'Daylight ' : 'Standard ');
+}
+function getDST(origOffset, type, date, callback) {
+	if (type === null || dst == undefined || dst === null) {
+		callback('N/A', 0, 'N/A', 0, false);
+		return origOffset;
+	}
+	var dstData = dst[type];
+	if (dstData == undefined) {
+		callback('N/A', 0, 'N/A', 0, false);
+		return origOffset;
+	}
+	var key = (dstData.useUTC ? date : new Date(date.getTime() + origOffset)).toISOString();
+	var timeList = dstData.times;
+	var lastOffset = 0;
+	var lastTime = "";
+	var nextOffset = 0;
+	var nextTime = "";
+	for (var t in timeList) {
+		if (!timeList.hasOwnProperty(t)) break;
+		if (key >= t) {
+			lastTime = t;
+			lastOffset = timeList[t];
+		} else {
+			nextTime = t;
+			nextOffset = timeList[t];
+			break;
+		}
+	}
+	if (callback != undefined && callback !== null) {
+		callback(lastTime, lastOffset, nextTime, nextOffset, dstData.useUTC);
+	}
+	return lastOffset * 3600000 + origOffset;
 }

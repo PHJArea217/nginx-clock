@@ -12,7 +12,8 @@ and a number of other web clocks, such as
 
 The clock displays time in local time, Coordinated Universal Time \(UTC) and
 all half-hour time zone offsets from -12 to +14.
-Support for ~~other time zones and~~ daylight saving time is planned.
+~~Support for other time zones and daylight saving time is planned.~~
+UPDATE: Daylight saving time is now supported.
 
 A live version of this web clock is available at https://webclock.peterjin.org.
 See [this document](online-demo.md) for more information.
@@ -21,12 +22,22 @@ To enable leap second warnings, compile and run ```IERSBulletinReader.java```
 using Java 8 or later and write its output to a file named ```iers-bulcd.json```
 located in the same directory as the ```index.html``` file.
 
+In order for the clock to successfully work, you will need to create a file
+called ```dst.js```. Unlike ```iers-bulcd.json```, this file is mandatory.
+Compile and run ```DST.java``` and write the program output to ```dst.js``` in
+the same directory as the ```index.html``` file.
+
+Pre-built versions of both files are available at
+
+* https://webclock.peterjin.org/iers-bulcd.json
+* https://webclock.peterjin.org/dst.js
+
 # Todo list
 
 - [x] Time zone selector
 - [x] Leap second warnings \(via IERS bulletin parsing)
 - [ ] Use multiple endpoint requests and average them out
-- [ ] Daylight saving time/summer time in time zone selector
+- [x] Daylight saving time/summer time in time zone selector
 
 # License \(2-clause BSD)
 
