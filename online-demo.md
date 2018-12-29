@@ -2,14 +2,19 @@
 
 ## What platform does this web clock demo run on?
 
-GitLab Pages for static content with Google Cloud Functions as the backend.
+GitLab Pages for static content with ~~Google Cloud Functions~~ an actual
+nginx webserver as the backend.
 
 Originally, I was considering the use of nginx on a VPS such as DigitalOcean,
 but it was a bit too expensive for such a simple app \(one HTTP request that
 simply returns the time). We use the Always Free limits; I have not even used
 even one cent of my free trial credit.
 
-Previously, this project used Google App Engine. However, there was a
+Previously, this project used Google Cloud Functions, but it appears that
+there is a bit of loading time for the Node.js runtime that it uses, and since
+now I have an actual VPS for other stuff, I can use it too for the web clock.
+
+And even earlier, this project used Google App Engine. However, there was a
 significant delay of ~5 seconds whenever the server-side API endpoint was
 called, which is unacceptable for a project like this, where latency must be
 kept to a minimum. In addition, there were a lot of unnecessary supplmentary
