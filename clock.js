@@ -1,5 +1,7 @@
-
-var xhrObj = null;
+'use strict';
+var xhrObjs = [];
+const xhrNum = 6;
+var accumulatedServerResults = [];
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
 var allowUpdate = true;
@@ -47,26 +49,18 @@ function get_current_time() {
 function set_display(f, v) {
 	document.getElementById(f).innerHTML = v;
 }
-function get_time_from_server_part2() {
-	if (xhrObj.readyState !== 4) return;
-	xhrObj.onreadystatechange = null;
-	if (xhrObj.status !== 200) {
-		set_display("status", "An unexpected error (" + xhrObj.status + ") has occurred.");
+function get_time_from_server_part2(resultJson, correction, latency) {
+	if (resultJson === null) {
+		set_display("status", "An unexpected error (" + correction + ") has occurred.");
 		set_display("status2", "Click below to resynchronize again");
 		setTimeout(() => showResynchronize(true), 1000);
 		return;
 	}
 	if (programState.timerObj != 0) clearTimeout(programState.timerObj);
 	var localTime = get_current_time();
-	/* half rtt */
-	var latency = (localTime - programState.startTime) / 2;
-	/* latency > 500 ms usually due to stalling server */
-	if (latency >= 500) latency = 500;
-	var resultJson = JSON.parse(xhrObj.responseText);
-	var remoteTime = resultJson.time * 1000;
 	/* when local time is lbase, remote time is rbase */
-	server_time = {"lbase": localTime, "rbase": remoteTime + latency};
-	set_display("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(server_time.rbase - new Date().getTime()) + " ms");
+	server_time = {"lbase": localTime, "rbase": resultJson.time};
+	set_display("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(correction) + " ms");
 	set_display("ipaddr", resultJson.remoteIP);
 	get_time_diff(true);
 	programState.syncCtr = 1000;
@@ -86,13 +80,60 @@ function get_time_from_server(do_clear) {
 	showResynchronize(false); /* hide the button to prevent repeated clicking */
 	programState.syncActive = false;
 	set_display("status2", "Resynchronizing now.");
-	if (xhrObj !== null) xhrObj.abort();
+	accumulatedServerResults = [];
+	while (xhrObjs.length > 0) {let i = xhrObjs.pop(); if (i instanceof XMLHttpRequest) i.abort();}
+	for (let i = 0; i < xhrNum; i++) {
+		setTimeout(getAndAccumulate, i * 50);
+	}
+}
+
+function getAndAccumulate() {
 	/* create request and record start time */
-	xhrObj = new XMLHttpRequest();
-	programState.startTime = get_current_time();
-	xhrObj.onreadystatechange = get_time_from_server_part2;
-	xhrObj.open("GET", (isDemo ? "https://apps-vm2.peterjin.org/time" : "/insvc/time") + "?random=" + Math.random(), true);
+	let xhrObj = new XMLHttpRequest();
+	let startTime = get_current_time();
+	xhrObj.onreadystatechange = function() {
+		let do_next = function () {
+			if (accumulatedServerResults.length != xhrNum) {
+				return;
+			}
+			let num = 0;
+			let dem = 0;
+			let lastError = null;
+			let averageLatency = 0;
+			let n = 0;
+			let remoteIP = "unknown";
+			for (let x of accumulatedServerResults) {
+				if (Number(x) >= 0) {
+					lastError = Number(x);
+					continue;
+				}
+				let correction = Number(1000 * x.response.time + x.latency - x.endTime);
+				num += correction / x.latency;
+				dem += 1 / x.latency;
+				remoteIP = x.response.remoteIP || "unknown";
+				averageLatency += x.latency;
+				n++;
+			}
+			if (Number.isNaN(num / dem)) {
+				get_time_from_server_part2(null, lastError, 0);
+			} else {
+				get_time_from_server_part2({time: new Date().getTime() + num / dem, remoteIP: remoteIP}, num / dem, averageLatency / n);
+			}
+		}
+		if (xhrObj.readyState !== 4) return;
+		let i = xhrObjs.indexOf(xhrObj);
+		if (i >= 0) xhrObjs[i] = null;
+		if (xhrObj.status !== 200) {
+			accumulatedServerResults.push(xhrObj.status);
+			do_next();
+			return;
+		}
+		accumulatedServerResults.push({response: JSON.parse(xhrObj.responseText), latency: Math.max(get_current_time() - startTime, 1) / 2, endTime: new Date().getTime()});
+		do_next();
+	};
+	xhrObj.open("GET", (isDemo ? "https://apps-vm" + (Math.random() > 0.5 ? 2 : 1) + ".peterjin.org/time" : "/insvc/time") + "?random=" + Math.random(), true);
 	xhrObj.send(null);
+	xhrObjs.push(xhrObj);
 }
 function set_ampm(ampm) {
 	useAMPM = ampm;
