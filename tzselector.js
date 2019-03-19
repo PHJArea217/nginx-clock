@@ -62,8 +62,8 @@ function convertDSTName(name, isDst) {
 	return String(name).replace(/@/, isDst ? 'Summer ' : '').replace(/#/, isDst ? 'Daylight ' : 'Standard ');
 }
 function getDST(origOffset, type, date, callback) {
-	if (type === null || dst == undefined || dst === null) {
-		callback('N/A', 0, 'N/A', 0, false);
+	if (type === null || !this.hasOwnProperty('dst')) {
+		callback('N/A', 0, 'N/A', -1, false);
 		return origOffset;
 	}
 	var dstData = dst[type];

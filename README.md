@@ -18,12 +18,24 @@ UPDATE: Daylight saving time is now supported.
 A live version of this web clock is available at https://webclock.peterjin.org.
 See [this document](online-demo.md) for more information.
 
+# How to self-host
+
+You will need a computer \(VPS, physical computer, or something else)
+running the nginx web server.
+
+1. Copy the ```index.html```, ```clock.js```, ```tzselector.js```, and
+```iers.js``` files to anywhere in the webserver's file-serving location.
+2. Look for the ```location /_insvc/time``` block in the ```nginx.conf``` file
+here and copy the entire block to your ```nginx.conf``` in the ```server``` block.
+3. If you would like to use a different location instead of ```/_insvc/time```,
+you can update the top of ```clock.js``` to do so.
+
 To enable leap second warnings, compile and run ```IERSBulletinReader.java```
 using Java 8 or later and write its output to a file named ```iers-bulcd.json```
 located in the same directory as the ```index.html``` file.
 
-In order for the clock to successfully work, you will need to create a file
-called ```dst.js```. Unlike ```iers-bulcd.json```, this file is mandatory.
+In order for the clock to display Daylight Saving Time information, you will
+need to create a file called ```dst.js```.
 Compile and run ```DST.java``` and write the program output to ```dst.js``` in
 the same directory as the ```index.html``` file.
 
@@ -36,7 +48,7 @@ Pre-built versions of both files are available at
 
 - [x] Time zone selector
 - [x] Leap second warnings \(via IERS bulletin parsing)
-- [ ] Use multiple endpoint requests and average them out
+- [x] Use multiple endpoint requests and average them out
 - [x] Daylight saving time/summer time in time zone selector
 
 # License \(2-clause BSD)

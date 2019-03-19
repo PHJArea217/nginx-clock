@@ -1,6 +1,8 @@
 'use strict';
 var xhrObjs = [];
-const xhrNum = 6;
+const xhrNum = 4;
+const insvc_time = "/_insvc/time";
+const servers = ["https://apps-vm1.peterjin.org/time", "https://apps-vm2.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
 var accumulatedServerResults = [];
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
@@ -53,7 +55,7 @@ function get_time_from_server_part2(resultJson, correction, latency) {
 	if (resultJson === null) {
 		set_display("status", "An unexpected error (" + correction + ") has occurred.");
 		set_display("status2", "Click below to resynchronize again");
-		setTimeout(() => showResynchronize(true), 1000);
+		setTimeout(function() {showResynchronize(true);}, 1000);
 		return;
 	}
 	if (programState.timerObj != 0) clearTimeout(programState.timerObj);
@@ -66,7 +68,7 @@ function get_time_from_server_part2(resultJson, correction, latency) {
 	programState.syncCtr = 1000;
 	programState.syncActive = true;
 	/* display button quickly if latency is high and the time is therefore inaccurate */
-	setTimeout(() => showResynchronize(true), (latency > 300) ? 100 : 5000);
+	setTimeout(function() {showResynchronize(true);}, (latency > 300) ? 100 : 5000);
 	display_time();
 }
 function get_time_from_server(do_clear) {
@@ -131,7 +133,7 @@ function getAndAccumulate() {
 		accumulatedServerResults.push({response: JSON.parse(xhrObj.responseText), latency: Math.max(get_current_time() - startTime, 1) / 2, endTime: new Date().getTime()});
 		do_next();
 	};
-	xhrObj.open("GET", (isDemo ? "https://apps-vm" + (Math.random() > 0.5 ? 2 : 1) + ".peterjin.org/time" : "/insvc/time") + "?random=" + Math.random(), true);
+	xhrObj.open("GET", (isDemo ? servers[Math.floor(Math.random() * 3)] : insvc_time) + "?random=" + Math.random(), true);
 	xhrObj.send(null);
 	xhrObjs.push(xhrObj);
 }
@@ -142,22 +144,22 @@ function displayTimeToString(time, useAMPM) {
 	var ampm = '';
 	var h = time.getUTCHours();
 	if (useAMPM) {
-		ampm = h >= 12 ? 'p.m.' : 'a.m.';
+		ampm = h >= 12 ? ' p.m.' : ' a.m.';
 		h = h % 12;
 		if (h === 0) h = 12;
 	}
-	var p = m => m < 10 ? '0' : '';
+	var p = function(m) {return m < 10 ? '0' : ''};
 	var m = time.getUTCMinutes();
 	var s = time.getUTCSeconds();
-	return `${p(h)}${h}:${p(m)}${m}:${p(s)}${s} ${ampm}`;
+	return p(h) + h + ':' + p(m) + m + ':' + p(s) + s + ampm;
 }
 function displayDateToString(time) {
 	var daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	var p = m => m < 10 ? '0' : '';
+	var p = function(m) {return m < 10 ? '0' : ''};
 	var y = time.getUTCFullYear();
 	var m = time.getUTCMonth() + 1;
 	var d = time.getUTCDate();
-	return `${daysOfTheWeek[time.getUTCDay()]} ${y}-${p(m)}${m}-${p(d)}${d}`;
+	return String(daysOfTheWeek[time.getUTCDay()]) + ' ' + y + '-' + p(m) + m + '-' + p(d) + d;
 }
 function display_time() {
 	var newltime = get_current_time();
@@ -185,10 +187,9 @@ function display_time() {
 			var nTimeAdjust = new Date(nTime + "Z");
 			if (!useUTC) nTimeAdjust = new Date(nTimeAdjust.getTime() + 3600000 * tOff);
 			var nTimeStr = displayDateToString(nTimeAdjust) + " " + displayTimeToString(nTimeAdjust, useAMPM);
-			var nextDST = nTime === 'N/A' ? '&nbsp;' : `Next DST: ${nOff !== 0 ? 'begins' : 'ends'} at ${nTimeStr + (useUTC ? ' (UTC)' : '')}`;
-			set_display("tzInfo", `
-			${convertDSTName(data.name, tOff !== 0)} (${getUtcOffsetS(data.stdo + tOff)})<br>&nbsp;
-			${nextDST}`);
+			var nextDST = nTime === 'N/A' ? (nOff === -1 ? 'Warning: No DST information!' : '&nbsp;') : 'Next DST: ' +
+				(nOff !== 0 ? 'begins' : 'ends') + ' at ' + nTimeStr + (useUTC ? ' (UTC)' : '');
+			set_display("tzInfo", convertDSTName(data.name, tOff !== 0) + ' (' + getUtcOffsetS(data.stdo + tOff) + ')<br>&nbsp;' + nextDST);
 		};
 		if (data !== undefined && data !== null) {
 			ofs = Number(getDST(data.stdo * 3600000, data.dst, newrtime, callback));
@@ -205,7 +206,7 @@ function display_time() {
 		if (get_time_diff(false)) {
 			programState.syncActive = false;
 			set_display("status2", "Local clock drifted, resynchronizing.");
-			setTimeout(() => get_time_from_server(false), 2000);
+			setTimeout(function() {get_time_from_server(false);}, 2000);
 		} else if (programState.syncCtr <= 0) {
 			get_time_from_server(false);
 		} else {
