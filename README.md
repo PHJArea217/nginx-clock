@@ -53,7 +53,7 @@ Pre-built versions of both files are available at
 
 # License \(2-clause BSD)
 
-Copyright 2018 Peter H. Jin
+Copyright 2018-2019 Peter H. Jin
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
