@@ -2,7 +2,7 @@
 var xhrObjs = [];
 const xhrNum = 4;
 const insvc_time = "/_insvc/time";
-const servers = ["https://apps-vm1.peterjin.org/time", "https://apps-vm3.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
+const servers = ["https://vm6-superhost.srv.peterjin.org/time", "https://apps-vm3.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
 var accumulatedServerResults = [];
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
