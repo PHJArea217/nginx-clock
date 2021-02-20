@@ -1,0 +1,39 @@
+body {
+	background: #000;
+}
+#date, #topText, #tzInfo {
+	background: #333;
+	color: #fff;
+	padding-bottom: 8px;
+	padding-top: 8px;
+}
+#date {
+	font-size: 32px;
+}
+#time {
+	background: #466;
+	color: #fff;
+	font-size: 64px;
+	font-family: "Liberation Mono", "DejaVu Sans", "Verdana", "Courier New", sans-serif;
+	font-weight: bold;
+}
+#topText {
+	font-size: 28px;
+	color: #bf9;
+}
+.main-content {
+	color: #fff;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	width: 600px;
+}
+a:link {
+	color: #ccf;
+}
+a:visited {
+	color: #fcf;
+}
+#resync_control {
+	display: none;
+}

@@ -56,10 +56,15 @@ function tzselector_init() {
 	};
 }
 function getUtcOffsetS(offset) {
+	offset = Number(offset);
 	return "UTC" + (offset >= 0 ? '+' : '') + offset;
 }
 function convertDSTName(name, isDst) {
-	return String(name).replace(/@/, isDst ? 'Summer ' : '').replace(/#/, isDst ? 'Daylight ' : 'Standard ');
+	let s = String(name);
+	if (s.indexOf("<") >= 0) {
+		return '[WARNING: POSSIBLE XSS ATTACK!]';
+	}
+	return s.replace(/@/, isDst ? 'Summer ' : '').replace(/#/, isDst ? 'Daylight ' : 'Standard ');
 }
 function getDST(origOffset, type, date, callback) {
 	if (type === null || !this.hasOwnProperty('dst')) {

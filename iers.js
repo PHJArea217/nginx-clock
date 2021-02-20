@@ -19,7 +19,7 @@ function iers_bulletin_callback() {
 	var bulcData = iersData.bulc;
 	var i = 0;
 	for (; i<bulcData.length; i++) {
-		displayStr += "TAI&minus;UTC = " + bulcData[i].taiutc + " s since " + new Date(bulcData[i].from * 1000).toUTCString() + "<br />";
+		displayStr += "TAI&minus;UTC = " + Number(bulcData[i].taiutc) + " s since " + new Date(bulcData[i].from * 1000).toUTCString() + "<br />";
 	}
 	var buldData = iersData.buld;
 	var currentTime = new Date().getTime();
@@ -27,6 +27,6 @@ function iers_bulletin_callback() {
 	if (((buldData[0].from * 1000) > currentTime) && (buldData[1].from !== 0)) {
 		useIndex = 1;
 	}
-	displayStr += "DUT1 = " + buldData[useIndex].dut1 + " s since " + new Date(buldData[useIndex].from * 1000).toUTCString() + "<br />";
+	displayStr += "DUT1 = " + Number(buldData[useIndex].dut1) + " s since " + new Date(buldData[useIndex].from * 1000).toUTCString() + "<br />";
 	document.getElementById("iersbulcd").innerHTML = displayStr;
 }

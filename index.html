@@ -2,79 +2,45 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- @!!erase me if demo!!
-<script src="https://apps-vm3.peterjin.org/hststrigger.js"></script>
-<script src="https://apps-vm1.peterjin.org/hststrigger.js"></script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://apps-vm3.srv.peterjin.org; connect-src 'self' https://apps-vm3.srv.peterjin.org https://apps-vm8.srv.peterjin.org https://vm6-superhost.srv.peterjin.org https://us-central1-webclockbackend.cloudfunctions.net" />
+<link rel="stylesheet" href="https://apps-vm3.srv.peterjin.org/hststrigger.css" />
 <title>Online Web Clock</title>
 @!!erase me if demo!! -->
 <title>Self-Hosted Web Clock</title> <!-- @!!erase me if demo!! -->
-<style>
-body {
-	background: #000;
-}
-#date, #topText, #tzInfo {
-	background: #333;
-	color: #fff;
-	padding-bottom: 8px;
-	padding-top: 8px;
-}
-#time {
-	background: #466;
-	color: #fff;
-	font-size: 64px;
-	font-family: "Liberation Mono", "DejaVu Sans", "Verdana", "Courier New", sans-serif;
-	font-weight: bold;
-}
-#topText {
-	font-size: 28px;
-	color: #bf9;
-}
-.main-content {
-	color: #fff;
-	text-align: center;
-	margin-left: auto;
-	margin-right: auto;
-	width: 600px;
-}
-a:link {
-	color: #ccf;
-}
-a:visited {
-	color: #fcf;
-}
-</style>
-<script type="text/javascript">
-var isDemo = true;
-isDemo = false; /* @!!erase me if demo!! */
-</script>
+<link rel="stylesheet" href="clock.css" />
 <script type="text/javascript" src="iers.js"></script>
 <script type="text/javascript" src="clock.js"></script>
 <script type="text/javascript" src="dst.js"></script>
 <script type="text/javascript" src="tzselector.js"></script>
 </head>
-<body onload="try_performance_now(); get_time_from_server(true); tzselector_init(); read_iers_bulletin();">
+<body>
 <br />
 <div class="main-content">
 <div id="topText">Right now, the current time is:</div>
 <div id="time">No JS?</div>
-<div id="date" style="font-size: 32px;">&nbsp;</div>
+<div id="date">&nbsp;</div>
 <div id="tzInfo">&nbsp;<br />&nbsp;</div><br />
 <div><select id="tzselector"></select></div>
-<p><a href="javascript:set_ampm(true);">12-hr</a> | <a href="javascript:set_ampm(false);">24-hr</a></p>
+<p><button id="pjtl-webclock-btn-12hr">12-hr</button> <button id="pjtl-webclock-btn-24hr">24-hr</button></p>
 <p id="iersbulcd">&nbsp;</p>
-<p id="resync_control_show_button"><a href="javascript:show_resync();">Technical Information</a></p>
+<p id="resync_control_show_button"><button id="pjtl-webclock-btn-techinfo">Technical Information</button></p>
 <noscript>Please enable JavaScript to use this application.</noscript>
-<div id="resync_control" style="display: none;">
+<div id="resync_control">
 <div id="status">&nbsp;</div>
 <div id="status2">&nbsp;</div>
-<p>&nbsp;<span id="resync_now_button" style="display: none;"><a href="javascript:get_time_from_server(true);">Resynchronize now</a></span>&nbsp;</p>
+<p><button id="pjtl-webclock-btn-resync">Resynchronize now</button></p>
 <p>Your IP address is <span id="ipaddr"></span></p>
 </div>
 <hr />
-<p>&copy; 2018-2020 Peter Jin<br />
+<p>&copy; 2018-2021 Peter Jin<br />
 <a href="https://github.com/PHJArea217/nginx-clock">GitHub</a> - <a href="https://gitlab.com/PHJArea217/nginx-clock">GitLab</a></p>
 <p>
 <!-- [LAST UPDATE TIME] -->
 </p>
 </div>
 </body>
+<!-- @!!erase me if demo!!
+<script type="text/javascript" src="demo.js"></script>
+@!!erase me if demo!! -->
+<script type="text/javascript" src="csp.js" defer></script>
 </html>

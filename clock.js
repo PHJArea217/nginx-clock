@@ -1,8 +1,9 @@
 'use strict';
 var xhrObjs = [];
+var isDemo = false;
 const xhrNum = 4;
 const insvc_time = "/_insvc/time";
-const servers = ["https://apps-vm1.peterjin.org/time", "https://apps-vm3.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
+const servers = ["https://apps-vm8.srv.peterjin.org/time", "https://apps-vm3.srv.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
 var accumulatedServerResults = [];
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
@@ -12,10 +13,10 @@ var server_time = null;
 var timeZone = "U-9999";
 /* show/hide the "resynchronize now" link */
 function showResynchronize(t) {
-	document.getElementById("resync_now_button").style.display = t ? "" : "none";
+	document.getElementById("pjtl-webclock-btn-resync").disabled = !t;
 }
 function show_resync() {
-	document.getElementById("resync_control").style.display = "";
+	document.getElementById("resync_control").style.display = "block";
 	document.getElementById("resync_control_show_button").style.display = "none";
 }
 /* determine whether window.performance.now is available */
@@ -51,10 +52,13 @@ function get_current_time() {
 function set_display(f, v) {
 	document.getElementById(f).innerHTML = v;
 }
+function set_display_s(f, v) {
+	document.getElementById(f).innerText = v;
+}
 function get_time_from_server_part2(resultJson, correction, latency) {
 	if (resultJson === null) {
-		set_display("status", "An unexpected error (" + correction + ") has occurred.");
-		set_display("status2", "Click below to resynchronize again");
+		set_display_s("status", "An unexpected error (" + correction + ") has occurred.");
+		set_display_s("status2", "Click below to resynchronize again");
 		setTimeout(function() {showResynchronize(true);}, 1000);
 		return;
 	}
@@ -62,8 +66,8 @@ function get_time_from_server_part2(resultJson, correction, latency) {
 	var localTime = get_current_time();
 	/* when local time is lbase, remote time is rbase */
 	server_time = {"lbase": localTime, "rbase": resultJson.time};
-	set_display("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(correction) + " ms");
-	set_display("ipaddr", resultJson.remoteIP);
+	set_display_s("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(correction) + " ms");
+	set_display_s("ipaddr", resultJson.remoteIP);
 	get_time_diff(true);
 	programState.syncCtr = 1000;
 	programState.syncActive = true;
@@ -76,12 +80,12 @@ function get_time_from_server(do_clear) {
 		/* stop clock, reset zero */
 		if (programState.timerObj !== 0) clearTimeout(programState.timerObj);
 		programState.timerObj = 0;
-		set_display("time", "00:00:00");
-		set_display("date", "&nbsp;");
+		set_display_s("time", "00:00:00");
+		set_display_s("date", "\u00a0");
 	}
 	showResynchronize(false); /* hide the button to prevent repeated clicking */
 	programState.syncActive = false;
-	set_display("status2", "Resynchronizing now.");
+	set_display_s("status2", "Resynchronizing now.");
 	accumulatedServerResults = [];
 	while (xhrObjs.length > 0) {let i = xhrObjs.pop(); if (i instanceof XMLHttpRequest) i.abort();}
 	for (let i = 0; i < xhrNum; i++) {
@@ -196,8 +200,8 @@ function display_time() {
 		}
 	}
 	var displayTime = new Date(newrtime.getTime() + ofs);
-	set_display("time", displayTimeToString(displayTime, useAMPM));
-	set_display("date", displayDateToString(displayTime));
+	set_display_s("time", displayTimeToString(displayTime, useAMPM));
+	set_display_s("date", displayDateToString(displayTime));
 	programState.timerObj = setTimeout(display_time, timeTillNextSecond);
 	/* display the utc offset */
 	/* = newrtime.getTimezoneOffset() / -60.0; */
@@ -205,12 +209,12 @@ function display_time() {
 	if (programState.syncActive) {
 		if (get_time_diff(false)) {
 			programState.syncActive = false;
-			set_display("status2", "Local clock drifted, resynchronizing.");
+			set_display_s("status2", "Local clock drifted, resynchronizing.");
 			setTimeout(function() {get_time_from_server(false);}, 2000);
 		} else if (programState.syncCtr <= 0) {
 			get_time_from_server(false);
 		} else {
-			set_display("status2", "Resynchronizing in " + --programState.syncCtr + " seconds.");
+			set_display_s("status2", "Resynchronizing in " + --programState.syncCtr + " seconds.");
 		}
 	}
 }
