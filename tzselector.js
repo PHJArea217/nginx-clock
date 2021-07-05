@@ -18,7 +18,7 @@ var tzList = {
 	/* Quarter-hour UTC offsets not otherwise selectable using the selector */
 	A13: {name: "Nepal Standard Time", dst: "none", stdo: 5.75},
 	A14: {name: "Australian Central Western Time", dst: "none", stdo: 8.75},
-	A15: {name: "Chatham Standard Time", dst: "au", stdo: 12.75}
+	A15: {name: "Chatham #Time", dst: "au", stdo: 12.75}
 };
 function tzselector_init() {
 	/* Restore state of current time zone. */
