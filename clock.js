@@ -3,7 +3,7 @@ var xhrObjs = [];
 var isDemo = false;
 const xhrNum = 4;
 const insvc_time = "/_insvc/time";
-const servers = ["https://vm6-superhost.srv.peterjin.org/time", "https://apps-vm3.srv.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
+const servers = [/*"https://vm6-superhost.srv.peterjin.org/time",*/ "https://apps-vm3.srv.peterjin.org/time", "https://us-central1-webclockbackend.cloudfunctions.net/time"];
 var accumulatedServerResults = [];
 /* syncAt based on local time */
 var programState = {"startTime": 0, "timerObj": 0, "usePNow": true, "timeDiff": 0, "syncCtr": 0, "elapsed": 0, syncActive: false};
@@ -67,7 +67,7 @@ function get_time_from_server_part2(resultJson, correction, latency) {
 	/* when local time is lbase, remote time is rbase */
 	server_time = {"lbase": localTime, "rbase": resultJson.time};
 	set_display_s("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(correction) + " ms");
-	set_display_s("ipaddr", resultJson.remoteIP);
+	set_display_s("ipAddr-hide", resultJson.remoteIP);
 	get_time_diff(true);
 	programState.syncCtr = 1000;
 	programState.syncActive = true;

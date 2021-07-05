@@ -4,6 +4,11 @@ document.getElementById('pjtl-webclock-btn-techinfo').addEventListener('click', 
 document.getElementById('pjtl-webclock-btn-resync').addEventListener('click', function() {
 	get_time_from_server(true);
 });
+document.getElementById('ipAddr-show-btn').addEventListener('click', function(e) {
+	document.getElementById('ipAddr-hide').style.display = 'inline-block';
+	document.getElementById('ipAddr-show').style.display = 'none';
+	e.preventDefault();
+});
 try_performance_now();
 get_time_from_server(true);
 tzselector_init();

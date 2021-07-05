@@ -37,3 +37,6 @@ a:visited {
 #resync_control {
 	display: none;
 }
+#ipAddr-hide {
+	display: none;
+}
