@@ -68,6 +68,7 @@ function get_time_from_server_part2(resultJson, correction, latency) {
 	server_time = {"lbase": localTime, "rbase": resultJson.time};
 	set_display_s("status", "Latency: " + Math.round(latency) + " ms, Correction: " + Math.round(correction) + " ms");
 	set_display_s("ipAddr-hide", resultJson.remoteIP);
+	document.getElementById("ipAddr-show").style.display = "inline-block";
 	get_time_diff(true);
 	programState.syncCtr = 1000;
 	programState.syncActive = true;
